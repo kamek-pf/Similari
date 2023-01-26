@@ -17,18 +17,21 @@ use crate::trackers::visual_sort::track_attributes::{
 };
 use crate::trackers::visual_sort::visual_sort_py::PyVisualSortObservationSet;
 use crate::trackers::visual_sort::voting::VisualVoting;
-use crate::trackers::visual_sort::{PyWastedVisualSortTrack, VisualSortObservation};
+#[cfg(feature = "python")]
+use crate::trackers::visual_sort::PyWastedVisualSortTrack;
+use crate::trackers::visual_sort::VisualSortObservation;
 use crate::utils::clipping::bbox_own_areas::{
     exclusively_owned_areas, exclusively_owned_areas_normalized_shares,
 };
 use crate::voting::Voting;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use rand::Rng;
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 // /// Easy to use Visual SORT tracker implementation
 // ///
-#[pyclass(text_signature = "(shards, opts)")]
+#[cfg_attr(feature = "python", pyclass(text_signature = "(shards, opts)"))]
 pub struct VisualSort {
     store: RwLock<TrackStore<VisualAttributes, VisualMetric, VisualObservationAttributes>>,
     wasted_store: RwLock<TrackStore<VisualAttributes, VisualMetric, VisualObservationAttributes>>,
@@ -316,6 +319,7 @@ impl From<&Track<VisualAttributes, VisualMetric, VisualObservationAttributes>> f
     }
 }
 
+#[cfg(feature = "python")]
 impl From<Track<VisualAttributes, VisualMetric, VisualObservationAttributes>>
     for PyWastedVisualSortTrack
 {
@@ -683,13 +687,16 @@ mod tests {
         assert_eq!(attrs.predicted_boxes.len(), 3);
         assert_eq!(attrs.observed_features.len(), 3);
 
-        tracker.skip_epochs_for_scene(10, 5);
-        let tracks = tracker
-            .wasted()
-            .into_iter()
-            .map(PyWastedVisualSortTrack::from)
-            .collect::<Vec<_>>();
-        dbg!(&tracks);
+        #[cfg(feature = "python")]
+        {
+            tracker.skip_epochs_for_scene(10, 5);
+            let tracks = tracker
+                .wasted()
+                .into_iter()
+                .map(PyWastedVisualSortTrack::from)
+                .collect::<Vec<_>>();
+            dbg!(&tracks);
+        }
     }
 }
 

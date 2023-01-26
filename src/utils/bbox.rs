@@ -7,30 +7,35 @@ use crate::Errors::GenericBBoxConversionError;
 use crate::{Errors, EPS};
 use geo::{Area, Coord, LineString, Polygon};
 use itertools::Itertools;
-use pyo3::exceptions::PyAttributeError;
-use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::f32::consts::PI;
 
+#[cfg(feature = "python")]
+use pyo3::exceptions::PyAttributeError;
+
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
 /// Bounding box in the format (left, top, width, height)
 ///
+#[cfg_attr(feature = "python", pyclass)]
 #[derive(Clone, Default, Debug, Copy)]
-#[pyclass]
 pub struct BoundingBox {
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     left: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     top: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     width: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     height: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     confidence: f32,
 }
 
-#[pymethods]
+#[cfg_attr(feature = "python", pymethods)]
 impl BoundingBox {
+    #[cfg(feature = "python")]
     #[classattr]
     const __hash__: Option<Py<PyAny>> = None;
 
@@ -49,7 +54,7 @@ impl BoundingBox {
     /// Constructor. Confidence is set to 1.0
     ///
     ///
-    #[new]
+    #[cfg_attr(feature = "python", new)]
     pub fn new(left: f32, top: f32, width: f32, height: f32) -> Self {
         Self {
             left,
@@ -62,7 +67,7 @@ impl BoundingBox {
 
     /// Creates the bbox with custom confidence
     ///
-    #[staticmethod]
+    #[cfg_attr(feature = "python", staticmethod)]
     pub fn new_with_confidence(
         left: f32,
         top: f32,
@@ -86,19 +91,19 @@ impl BoundingBox {
 
 /// Bounding box in the format (x, y, angle, aspect, height)
 #[derive(Default, Debug)]
-#[pyclass]
+#[cfg_attr(feature = "python", pyclass)]
 pub struct Universal2DBox {
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     pub xc: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     pub yc: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     pub angle: Option<f32>,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     pub aspect: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     pub height: f32,
-    #[pyo3(get, set)]
+    #[cfg_attr(feature = "python", pyo3(get, set))]
     pub confidence: f32,
     _vertex_cache: Option<Polygon<f64>>,
 }
@@ -116,9 +121,9 @@ impl Clone for Universal2DBox {
     }
 }
 
-#[pymethods]
+#[cfg_attr(feature = "python", pymethod)]
 impl Universal2DBox {
-    #[classattr]
+    #[cfg(feature = "python")]
     const __hash__: Option<Py<PyAny>> = None;
 
     fn __repr__(&self) -> String {
@@ -135,7 +140,8 @@ impl Universal2DBox {
         (hw * hw + hh * hh).sqrt()
     }
 
-    #[pyo3(name = "as_ltwh")]
+    #[cfg(feature = "python")]
+    #[cfg_attr(feature = "python", pyo3(name = "as_ltwh"))]
     pub fn as_ltwh_py(&self) -> PyResult<BoundingBox> {
         let r = BoundingBox::try_from(self);
         if let Ok(res) = r {
@@ -145,7 +151,7 @@ impl Universal2DBox {
         }
     }
 
-    #[pyo3(name = "gen_vertices")]
+    #[cfg_attr(feature = "python", pyo3(name = "gen_vertices"))]
     pub fn gen_vertices_py(&mut self) {
         if self.angle.is_some() {
             let c = Polygon::from(&*self);
@@ -153,21 +159,21 @@ impl Universal2DBox {
         }
     }
 
-    #[pyo3(name = "get_vertices")]
+    #[cfg_attr(feature = "python", pyo3(name = "get_vertices"))]
     pub fn get_vertices_py(&self) -> PyPolygon {
         PyPolygon::new(Polygon::from(self))
     }
 
     /// Sets the angle
     ///
-    #[pyo3(name = "rotate")]
+    #[cfg_attr(feature = "python", pyo3(name = "rotate"))]
     pub fn rotate_py(&mut self, angle: f32) {
         self.angle = Some(angle)
     }
 
     /// Sets the angle
     ///
-    #[pyo3(name = "set_confidence")]
+    #[cfg_attr(feature = "python", pyo3(name = "set_confidence"))]
     pub fn set_confidence_py(&mut self, confidence: f32) {
         assert!(
             (0.0..=1.0).contains(&confidence),
@@ -178,7 +184,7 @@ impl Universal2DBox {
 
     /// Constructor. Creates new generic bbox and doesn't generate vertex cache
     ///
-    #[new]
+    #[cfg_attr(feature = "python", new)]
     pub fn new(xc: f32, yc: f32, angle: Option<f32>, aspect: f32, height: f32) -> Self {
         Self {
             xc,
@@ -193,7 +199,7 @@ impl Universal2DBox {
 
     /// Constructor. Creates new generic bbox and doesn't generate vertex cache
     ///
-    #[staticmethod]
+    #[cfg_attr(feature = "python", staticmethod)]
     pub fn new_with_confidence(
         xc: f32,
         yc: f32,
@@ -220,7 +226,7 @@ impl Universal2DBox {
 
     /// Constructor. Creates new generic bbox and doesn't generate vertex cache
     ///
-    #[staticmethod]
+    #[cfg_attr(feature = "python", staticmethod)]
     pub fn ltwh(left: f32, top: f32, width: f32, height: f32) -> Self {
         Self::from(BoundingBox::new_with_confidence(
             left, top, width, height, 1.0,
@@ -229,7 +235,7 @@ impl Universal2DBox {
 
     /// Constructor. Creates new generic bbox and doesn't generate vertex cache
     ///
-    #[staticmethod]
+    #[cfg_attr(feature = "python", staticmethod)]
     pub fn ltwh_with_confidence(
         left: f32,
         top: f32,

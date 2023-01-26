@@ -33,9 +33,10 @@ rayon = "1.5.3"
 [dependencies.pyo3]
 version = "0.16"
 features = ["extension-module"]
+optional = true
 
 [build-dependencies]
-pyo3-build-config = "0.16"
+pyo3-build-config = { version = "0.16", optional = true }
 
 [dev-dependencies]
 wide = "0.7.4"
@@ -51,3 +52,6 @@ opt-level = 3
 
 [package.metadata.maturin]
 python-source = "python"
+
+[features]
+python = ["pyo3", "pyo3-build-config"]
