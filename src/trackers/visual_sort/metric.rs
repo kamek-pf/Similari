@@ -13,6 +13,7 @@ use crate::trackers::visual_sort::track_attributes::VisualAttributes;
 use crate::utils::bbox::Universal2DBox;
 use crate::utils::kalman::kalman_2d_box::Universal2DBoxKalmanFilter;
 use anyhow::Result;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use std::default::Default;
 use std::iter::Iterator;
@@ -65,11 +66,13 @@ impl VisualSortMetricType {
     }
 }
 
+#[cfg(feature = "python")]
 #[pyclass]
 #[pyo3(name = "VisualSortMetricType")]
 #[derive(Clone, Debug)]
 pub struct PyVisualSortMetricType(pub VisualSortMetricType);
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl PyVisualSortMetricType {
     #[staticmethod]

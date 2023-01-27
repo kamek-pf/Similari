@@ -15,6 +15,7 @@ use crate::trackers::visual_sort::options::VisualSortOptions;
 use crate::trackers::visual_sort::track_attributes::{
     VisualAttributes, VisualAttributesUpdate, VisualSortLookup,
 };
+#[cfg(feature = "python")]
 use crate::trackers::visual_sort::visual_sort_py::PyVisualSortObservationSet;
 use crate::trackers::visual_sort::voting::VisualVoting;
 #[cfg(feature = "python")]
@@ -353,7 +354,9 @@ mod tests {
     use crate::trackers::visual_sort::observation_attributes::VisualObservationAttributes;
     use crate::trackers::visual_sort::options::VisualSortOptions;
     use crate::trackers::visual_sort::simple_api::VisualSort;
-    use crate::trackers::visual_sort::{PyWastedVisualSortTrack, VisualSortObservation};
+    #[cfg(feature = "python")]
+    use crate::trackers::visual_sort::PyWastedVisualSortTrack;
+    use crate::trackers::visual_sort::VisualSortObservation;
     use crate::utils::bbox::BoundingBox;
 
     #[test]
@@ -700,6 +703,7 @@ mod tests {
     }
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl VisualSort {
     #[new]

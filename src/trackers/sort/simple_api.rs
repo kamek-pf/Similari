@@ -5,17 +5,17 @@ use crate::trackers::epoch_db::EpochDb;
 use crate::trackers::sort::metric::SortMetric;
 use crate::trackers::sort::voting::SortVoting;
 use crate::trackers::sort::{
-    AutoWaste, PositionalMetricType, PyPositionalMetricType, SortLookup,
-    DEFAULT_AUTO_WASTE_PERIODICITY, MAHALANOBIS_NEW_TRACK_THRESHOLD,
+    AutoWaste, PositionalMetricType, SortAttributes, SortAttributesOptions, SortAttributesUpdate,
+    SortLookup, SortTrack, VotingType, DEFAULT_AUTO_WASTE_PERIODICITY,
+    MAHALANOBIS_NEW_TRACK_THRESHOLD,
 };
-use crate::trackers::sort::{
-    PyWastedSortTrack, SortAttributes, SortAttributesOptions, SortAttributesUpdate, SortTrack,
-    VotingType,
-};
+#[cfg(feature = "python")]
+use crate::trackers::sort::{PyPositionalMetricType, PyWastedSortTrack};
 use crate::trackers::spatio_temporal_constraints::SpatioTemporalConstraints;
 use crate::trackers::tracker_api::TrackerAPI;
 use crate::utils::bbox::Universal2DBox;
 use crate::voting::Voting;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use rand::Rng;
 use std::collections::HashMap;
@@ -23,7 +23,10 @@ use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 /// Easy to use SORT tracker implementation
 ///
-#[pyclass(text_signature = "(shards, bbox_history, max_idle_epochs, threshold)")]
+#[cfg_attr(
+    feature = "python",
+    pyclass(text_signature = "(shards, bbox_history, max_idle_epochs, threshold)")
+)]
 pub struct Sort {
     store: RwLock<TrackStore<SortAttributes, SortMetric, Universal2DBox>>,
     wasted_store: RwLock<TrackStore<SortAttributes, SortMetric, Universal2DBox>>,
@@ -268,6 +271,7 @@ impl From<&Track<SortAttributes, SortMetric, Universal2DBox>> for SortTrack {
     }
 }
 
+#[cfg(feature = "python")]
 impl From<Track<SortAttributes, SortMetric, Universal2DBox>> for PyWastedSortTrack {
     fn from(track: Track<SortAttributes, SortMetric, Universal2DBox>) -> Self {
         let attrs = track.get_attributes();
@@ -440,6 +444,7 @@ mod tests {
     }
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl Sort {
     #[new]

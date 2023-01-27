@@ -1,4 +1,5 @@
 use crate::track::{ObservationAttributes, ObservationMetricOk};
+#[cfg(feature = "python")]
 use crate::utils::clipping::clipping_py::PyPolygon;
 use crate::utils::clipping::sutherland_hodgman_clip;
 use crate::voting::topn::TopNVotingElt;
@@ -141,7 +142,7 @@ impl Universal2DBox {
     }
 
     #[cfg(feature = "python")]
-    #[cfg_attr(feature = "python", pyo3(name = "as_ltwh"))]
+    #[pyo3(name = "as_ltwh")]
     pub fn as_ltwh_py(&self) -> PyResult<BoundingBox> {
         let r = BoundingBox::try_from(self);
         if let Ok(res) = r {
@@ -151,7 +152,8 @@ impl Universal2DBox {
         }
     }
 
-    #[cfg_attr(feature = "python", pyo3(name = "gen_vertices"))]
+    #[cfg(feature = "python")]
+    #[pyo3(name = "gen_vertices")]
     pub fn gen_vertices_py(&mut self) {
         if self.angle.is_some() {
             let c = Polygon::from(&*self);
@@ -159,21 +161,24 @@ impl Universal2DBox {
         }
     }
 
-    #[cfg_attr(feature = "python", pyo3(name = "get_vertices"))]
+    #[cfg(feature = "python")]
+    #[pyo3(name = "get_vertices")]
     pub fn get_vertices_py(&self) -> PyPolygon {
         PyPolygon::new(Polygon::from(self))
     }
 
     /// Sets the angle
     ///
-    #[cfg_attr(feature = "python", pyo3(name = "rotate"))]
+    #[cfg(feature = "python")]
+    #[pyo3(name = "rotate")]
     pub fn rotate_py(&mut self, angle: f32) {
         self.angle = Some(angle)
     }
 
     /// Sets the angle
     ///
-    #[cfg_attr(feature = "python", pyo3(name = "set_confidence"))]
+    #[cfg(feature = "python")]
+    #[pyo3(name = "set_confidence")]
     pub fn set_confidence_py(&mut self, confidence: f32) {
         assert!(
             (0.0..=1.0).contains(&confidence),

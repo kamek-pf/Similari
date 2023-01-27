@@ -79,6 +79,7 @@ pub enum Errors {
 
 pub const EPS: f32 = 0.00001;
 
+#[cfg(feature = "python")]
 mod python {
     use crate::prelude::{
         BatchSort, BoundingBox, Sort, SortTrack, SpatioTemporalConstraints, Universal2DBox,

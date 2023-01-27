@@ -1,3 +1,4 @@
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 
 /// The struct allows defining the constraints for objects comprared across different epochs.
@@ -13,7 +14,7 @@ use pyo3::prelude::*;
 /// * `R_Track` - radius of the circle surrounding the last bounding box of the track.
 ///
 
-#[pyclass]
+#[cfg_attr(feature = "python", pyclass)]
 #[derive(Default, Debug, Clone)]
 pub struct SpatioTemporalConstraints {
     constraints: Vec<(usize, f32)>,
@@ -31,9 +32,9 @@ impl SpatioTemporalConstraints {
     }
 }
 
-#[pymethods]
+#[cfg_attr(feature = "python", pymethods)]
 impl SpatioTemporalConstraints {
-    #[new]
+    #[cfg_attr(feature = "python", new)]
     fn new() -> Self {
         Self::default()
     }
@@ -43,7 +44,10 @@ impl SpatioTemporalConstraints {
     /// # Parameters
     /// * `constraints` - Vec of tuples (epoch_delta, max_allowed_distance)
     ///
-    #[pyo3(text_signature = "($self, l: [(epoch_delta, max_allowed_distance)]")]
+    #[cfg_attr(
+        feature = "python",
+        pyo3(text_signature = "($self, l: [(epoch_delta, max_allowed_distance)]")
+    )]
     pub fn add_constraints(&mut self, constraints: Vec<(usize, f32)>) {
         for (delta, max_distance) in constraints {
             assert!(
@@ -58,7 +62,10 @@ impl SpatioTemporalConstraints {
 
     /// Validates the distance for specified epoch delta
     ///
-    #[pyo3(text_signature = "($self, epoch_delta, dist)")]
+    #[cfg_attr(
+        feature = "python",
+        pyo3(text_signature = "($self, epoch_delta, dist)")
+    )]
     pub fn validate(&self, epoch_delta: usize, dist: f32) -> bool {
         assert!(
             dist >= 0.0,

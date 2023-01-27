@@ -1,4 +1,5 @@
 use crate::utils::bbox::Universal2DBox;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 
 /// Track metric implementation
@@ -18,6 +19,7 @@ pub mod observation_attributes;
 pub mod simple_api;
 
 /// Python API implementation
+#[cfg(feature = "python")]
 pub mod visual_sort_py;
 
 /// Batched API that accepts the batch with multiple scenes at once
@@ -51,6 +53,7 @@ impl<'a> VisualSortObservation<'a> {
 
 /// Online track structure that contains tracking information for the last tracker epoch
 ///
+#[cfg(feature = "python")]
 #[derive(Debug, Clone)]
 #[pyclass]
 #[pyo3(name = "WastedVisualSortTrack")]
@@ -93,6 +96,7 @@ pub struct PyWastedVisualSortTrack {
     pub observed_features: Vec<Option<Vec<f32>>>,
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl PyWastedVisualSortTrack {
     #[classattr]

@@ -5,21 +5,24 @@ use crate::prelude::{
 use crate::store::track_distance::TrackDistanceOkIterator;
 use crate::store::TrackStore;
 use crate::track::Track;
-use crate::trackers::batch::{PredictionBatchRequest, PredictionBatchResult, SceneTracks};
+use crate::trackers::batch::{PredictionBatchRequest, SceneTracks};
 use crate::trackers::epoch_db::EpochDb;
 use crate::trackers::sort::metric::SortMetric;
+#[cfg(feature = "python")]
 use crate::trackers::sort::sort_py::PySortPredictionBatchRequest;
 use crate::trackers::sort::voting::SortVoting;
 use crate::trackers::sort::{
-    AutoWaste, PyPositionalMetricType, PyWastedSortTrack, SortAttributes, SortAttributesOptions,
-    SortAttributesUpdate, SortLookup, DEFAULT_AUTO_WASTE_PERIODICITY,
-    MAHALANOBIS_NEW_TRACK_THRESHOLD,
+    AutoWaste, SortAttributes, SortAttributesOptions, SortAttributesUpdate, SortLookup,
+    DEFAULT_AUTO_WASTE_PERIODICITY, MAHALANOBIS_NEW_TRACK_THRESHOLD,
 };
+#[cfg(feature = "python")]
+use crate::trackers::sort::{PyPositionalMetricType, PyWastedSortTrack};
 use crate::trackers::spatio_temporal_constraints::SpatioTemporalConstraints;
 use crate::trackers::tracker_api::TrackerAPI;
 use crate::voting::Voting;
 use crossbeam::channel::{Receiver, Sender};
 use log::warn;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use rand::Rng;
 use std::collections::HashMap;
@@ -45,7 +48,7 @@ enum VotingCommands {
     Exit,
 }
 
-#[pyclass]
+#[cfg_attr(feature = "python", pyclass)]
 pub struct BatchSort {
     monitor: Option<BatchBusyMonitor>,
     store: Arc<RwLock<MiddlewareSortTrackStore>>,
@@ -366,6 +369,7 @@ mod tests {
     }
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl BatchSort {
     #[new]

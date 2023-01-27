@@ -249,6 +249,7 @@ mod tests {
     }
 }
 
+#[cfg(feature = "python")]
 pub mod python {
     use crate::prelude::{BoundingBox, Universal2DBox};
     use crate::utils::kalman::kalman_2d_box::{Universal2DBoxKalmanFilter, DIM_2D_BOX_X2};

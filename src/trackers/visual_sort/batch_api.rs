@@ -18,8 +18,10 @@ use crate::trackers::visual_sort::observation_attributes::VisualObservationAttri
 use crate::trackers::visual_sort::track_attributes::{
     VisualAttributes, VisualAttributesUpdate, VisualSortLookup,
 };
+#[cfg(feature = "python")]
 use crate::trackers::visual_sort::visual_sort_py::PyVisualSortPredictionBatchRequest;
 use crate::trackers::visual_sort::voting::VisualVoting;
+#[cfg(feature = "python")]
 use crate::trackers::visual_sort::PyWastedVisualSortTrack;
 use crate::utils::clipping::bbox_own_areas::{
     exclusively_owned_areas, exclusively_owned_areas_normalized_shares,
@@ -27,6 +29,7 @@ use crate::utils::clipping::bbox_own_areas::{
 use crate::voting::Voting;
 use crossbeam::channel::{Receiver, Sender};
 use log::warn;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use rand::Rng;
 use std::mem;
@@ -54,7 +57,10 @@ enum VotingCommands {
 
 // /// Easy to use Visual SORT tracker implementation
 // ///
-#[pyclass(text_signature = "(distance_shards, voting_shards, opts)")]
+#[cfg_attr(
+    feature = "python",
+    pyclass(text_signature = "(distance_shards, voting_shards, opts)")
+)]
 pub struct BatchVisualSort {
     monitor: Option<BatchBusyMonitor>,
     store: Arc<RwLock<MiddlewareVisualSortTrackStore>>,
@@ -457,6 +463,7 @@ mod tests {
     }
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl BatchVisualSort {
     #[new]

@@ -8,6 +8,7 @@ use crate::utils::bbox::Universal2DBox;
 use crate::utils::kalman::kalman_2d_box::DIM_2D_BOX_X2;
 use crate::utils::kalman::KalmanState;
 use anyhow::Result;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, RwLock};
@@ -24,6 +25,7 @@ pub mod voting;
 
 /// Python bindings for SORT objects
 ///
+#[cfg(feature = "python")]
 pub mod sort_py;
 
 /// SORT tracker with Batch API
@@ -328,44 +330,45 @@ mod track_tests {
 /// Online track structure that contains tracking information for the last tracker epoch
 ///
 #[derive(Debug, Clone)]
-#[pyclass]
+#[cfg_attr(feature = "python", pyclass)]
 pub struct SortTrack {
     /// id of the track
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub id: u64,
     /// when the track was lastly updated
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub epoch: usize,
     /// the bbox predicted by KF
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub predicted_bbox: Universal2DBox,
     /// the bbox passed by detector
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub observed_bbox: Universal2DBox,
     /// user-defined scene id that splits tracking space on isolated realms
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub scene_id: u64,
     /// current track length
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub length: usize,
     /// what kind of voting was led to the current merge
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub voting_type: VotingType,
     /// custom object id passed by the user to find the track easily
     ///
-    #[pyo3(get)]
+    #[cfg_attr(feature = "python", pyo3(get))]
     pub custom_object_id: Option<i64>,
 }
 
 /// Online track structure that contains tracking information for the last tracker epoch
 ///
+#[cfg(feature = "python")]
 #[derive(Debug, Clone)]
 #[pyclass]
 #[pyo3(name = "WastedSortTrack")]
@@ -404,6 +407,7 @@ pub struct PyWastedSortTrack {
     pub observed_boxes: Vec<Universal2DBox>,
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl SortTrack {
     #[classattr]
@@ -418,6 +422,7 @@ impl SortTrack {
     }
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl PyWastedSortTrack {
     #[classattr]
@@ -432,7 +437,7 @@ impl PyWastedSortTrack {
     }
 }
 
-#[pyclass]
+#[cfg_attr(feature = "python", pyclass)]
 #[derive(Default, Debug, Clone, Copy)]
 pub enum VotingType {
     #[default]
@@ -440,6 +445,7 @@ pub enum VotingType {
     Positional,
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl VotingType {
     #[classattr]
@@ -461,11 +467,13 @@ pub enum PositionalMetricType {
     IoU(f32),
 }
 
+#[cfg(feature = "python")]
 #[pyclass]
 #[pyo3(name = "PositionalMetricType")]
 #[derive(Clone, Debug)]
 pub struct PyPositionalMetricType(pub PositionalMetricType);
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl PyPositionalMetricType {
     #[staticmethod]

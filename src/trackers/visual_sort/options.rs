@@ -1,15 +1,18 @@
-use crate::trackers::sort::{PositionalMetricType, PyPositionalMetricType, SortAttributesOptions};
+#[cfg(feature = "python")]
+use crate::trackers::sort::PyPositionalMetricType;
+use crate::trackers::sort::{PositionalMetricType, SortAttributesOptions};
 use crate::trackers::spatio_temporal_constraints::SpatioTemporalConstraints;
 use crate::trackers::visual_sort::metric::builder::VisualMetricBuilder;
-use crate::trackers::visual_sort::metric::{
-    PyVisualSortMetricType, VisualMetric, VisualSortMetricType,
-};
+#[cfg(feature = "python")]
+use crate::trackers::visual_sort::metric::PyVisualSortMetricType;
+use crate::trackers::visual_sort::metric::{VisualMetric, VisualSortMetricType};
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::sync::RwLock;
 
 /// Class that is used to configure the Visual Tracker
-#[pyclass]
+#[cfg_attr(feature = "python", pyclass)]
 #[derive(Debug, Clone)]
 pub struct VisualSortOptions {
     max_idle_epochs: usize,
@@ -192,6 +195,7 @@ impl Default for VisualSortOptions {
     }
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl VisualSortOptions {
     #[new]
@@ -300,6 +304,7 @@ impl VisualSortOptions {
     }
 }
 
+#[cfg(feature = "python")]
 #[cfg(test)]
 mod tests {
     use crate::trackers::sort::{PositionalMetricType, PyPositionalMetricType};

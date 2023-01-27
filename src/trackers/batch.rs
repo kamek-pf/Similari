@@ -1,6 +1,7 @@
 use crate::prelude::SortTrack;
 use crossbeam::channel::{Receiver, Sender};
 use log::debug;
+#[cfg(feature = "python")]
 use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -15,19 +16,20 @@ pub struct PredictionBatchRequest<T> {
     batch_size: Arc<Mutex<usize>>,
 }
 
-#[pyclass]
+#[cfg_attr(feature = "python", pyclass)]
 #[derive(Clone, Debug)]
 pub struct PredictionBatchResult {
     receiver: Receiver<SceneTracks>,
     batch_size: Arc<Mutex<usize>>,
 }
 
-#[pymethods]
+#[cfg_attr(feature = "python", pymethods)]
 impl PredictionBatchResult {
     pub fn ready(&self) -> bool {
         !self.receiver.is_empty()
     }
 
+    #[cfg(feature = "python")]
     #[pyo3(name = "get", text_signature = "($self)")]
     fn get_py(&self) -> SceneTracks {
         let gil = Python::acquire_gil();
