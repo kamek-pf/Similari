@@ -311,7 +311,11 @@ impl ObservationMetric<VisualAttributes, VisualObservationAttributes> for Visual
         let feature_quality = obs_attrs.visual_quality();
         let own_area_percentage_opt = *obs_attrs.own_area_percentage_opt();
 
-        let predicted_bbox = attrs.make_prediction(observation_bbox);
+        // Get a valid prediction or bail
+        let predicted_bbox = attrs
+            .make_prediction(observation_bbox)
+            .ok_or_else(|| anyhow::anyhow!("Prediction failed"))?;
+
         attrs.update_history(
             observation_bbox,
             &predicted_bbox,
