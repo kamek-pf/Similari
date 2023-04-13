@@ -86,20 +86,21 @@ impl ObservationMetric<SortAttributes, Universal2DBox> for SortMetric {
         let observation_bbox = observation.attr().as_ref().unwrap();
         features.clear();
 
-        // Get a valid prediction or bail
-        let predicted_bbox = attrs
-            .make_prediction(observation_bbox)
-            .ok_or_else(|| anyhow::anyhow!("Prediction failed"))?;
+        // Handle valid predictions
+        match attrs.make_prediction(observation_bbox) {
+            Some(predicted_bbox) => {
+                attrs.update_history(observation_bbox, &predicted_bbox);
 
-        attrs.update_history(observation_bbox, &predicted_bbox);
+                *observation.attr_mut() = Some(match self.method {
+                    PositionalMetricType::Mahalanobis => predicted_bbox,
+                    PositionalMetricType::IoU(_) => predicted_bbox.gen_vertices(),
+                });
 
-        *observation.attr_mut() = Some(match self.method {
-            PositionalMetricType::Mahalanobis => predicted_bbox,
-            PositionalMetricType::IoU(_) => predicted_bbox.gen_vertices(),
-        });
-
-        features.push(observation);
-        Ok(())
+                features.push(observation);
+                Ok(())
+            }
+            None => Ok(()),
+        }
     }
 
     fn postprocess_distances(
