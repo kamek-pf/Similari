@@ -27,7 +27,7 @@ rand = "0.8.5"
 log = "0.4.17"
 nalgebra = "0.31.0"
 pathfinding = "4.0.0"
-geo = "0.23"
+geo = "0.28"
 rayon = "1.5.3"
 
 [dependencies.pyo3]
