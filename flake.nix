@@ -11,7 +11,7 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [ cargo rustc rust-analyzer rustfmt cargo-outdated python3 ];
+          buildInputs = with pkgs; [ cargo rustc rust-analyzer rustfmt cargo-outdated ];
         };
       });
 }
